@@ -1,3 +1,4 @@
+"use client"
 import { configs } from "@/constants/configs"
 import { ImageKitProvider } from "@imagekit/next"
 import { SessionProvider } from "next-auth/react"

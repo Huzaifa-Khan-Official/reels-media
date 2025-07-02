@@ -1,14 +1,27 @@
 import User from "@/models/user.model";
+import { usernameValidation } from "@/schemas/register.schema";
 import { dbConnect } from "@/utils/db.util";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
     try {
-        const { email, password } = await req.json();
+        const { email, password, username } = await req.json();
 
         if (!email || !password) {
             return NextResponse.json(
                 { error: "Email and password are required" },
+                { status: 400 }
+            );
+        }
+
+        const checkUsernameUniqueness = usernameValidation.safeParse({
+            username
+        })
+
+        if (!checkUsernameUniqueness.success) {
+            console.log("Error at username validation ==>", checkUsernameUniqueness.error);
+            return NextResponse.json(
+                { error: "Invalid username" },
                 { status: 400 }
             );
         }

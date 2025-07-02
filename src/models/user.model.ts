@@ -6,6 +6,13 @@ const { Schema, model, models } = mongoose;
 export interface IUser {
     email: string;
     password: string;
+    username: string;
+    code?: string;
+    codeExpiry?: Date;
+    isVerified: boolean;
+    followers: mongoose.Types.ObjectId[];
+    following: mongoose.Types.ObjectId[];
+    profilePic?: string;
     _id?: mongoose.Types.ObjectId;
     createdAt?: Date;
     updatedAt?: Date;
@@ -20,6 +27,32 @@ const userSchema = new Schema<IUser>({
     password: {
         type: String,
         required: true,
+    },
+    username: {
+        type: String,
+        required: true,
+        unique: true,
+    },
+    code: {
+        type: String,
+    },
+    codeExpiry: {
+        type: Date,
+    },
+    isVerified: {
+        type: Boolean,
+        default: false,
+    },
+    followers: {
+        type: [Schema.Types.ObjectId],
+        default: [],
+    },
+    following: {
+        type: [Schema.Types.ObjectId],
+        default: [],
+    },
+    profilePic: {
+        type: String,
     },
 }, {
     timestamps: true,
