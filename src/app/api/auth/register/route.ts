@@ -1,6 +1,8 @@
 import User from "@/models/user.model";
 import { usernameValidation } from "@/schemas/register.schema";
 import { dbConnect } from "@/utils/db.util";
+import { generateOtp } from "@/utils/generateOTP";
+import { sendEmail } from "@/utils/sendMail";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
@@ -37,12 +39,14 @@ export async function POST(req: NextRequest) {
             );
         }
 
-        const user = await User.create({ email, password });
+        await User.create({ email, password });
 
-        return NextResponse.json(
-            { message: "User created successfully", user },
-            { status: 201 }
-        );
+        await sendEmail({ email, username, otp: generateOtp() });
+
+        // return NextResponse.json(
+        //     { message: "User created successfully", user },
+        //     { status: 201 }
+        // );
     } catch (error) {
         console.log("Error at user registration ==>", error);
         return NextResponse.json(

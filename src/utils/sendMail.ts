@@ -37,7 +37,7 @@ interface OTPData {
 }
 
 
-const sendEmail = async ({ email, username, otp }: OTPData, res: NextResponse) => {
+const sendEmail = async ({ email, username, otp }: OTPData) => {
     try {
         const emailTemplate = `
             <div style="font-family: Arial, sans-serif; font-size: 16px; color: #333;">
