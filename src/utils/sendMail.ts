@@ -1,8 +1,8 @@
 import { configs } from "@/constants/configs";
 import nodemailer from "nodemailer";
-import {nextResponse} from "./Response"
-import { NextResponse } from "next/server";
-// import serverConfig from "../config/serverConfig.js";
+import { nextResponse } from "./Response"
+import UserOTP from "@/models/userOTP.model";
+import bcrypt from "bcryptjs";
 
 const transporter = nodemailer.createTransport({
     service: "Gmail",
@@ -15,29 +15,14 @@ const transporter = nodemailer.createTransport({
     }
 });
 
-// const sendEmail = async (email: string, code: string) => {
-//     try {
-//         const response = await transporter.sendMail({
-//             from: configs.gmail_user_mail,
-//             to: email,
-//             subject: "Verification Code",
-//             text: `Your verification code is: ${code}`
-//         });
-
-//         return response;
-//     } catch (error) {
-//         throw error;
-//     }
-// };
-
 interface OTPData {
+    _id: string;
     email: string;
     username: string;
     otp: string;
 }
 
-
-const sendEmail = async ({ email, username, otp }: OTPData) => {
+const sendEmail = async ({  _id, email, username, otp }: OTPData) => {
     try {
         const emailTemplate = `
             <div style="font-family: Arial, sans-serif; font-size: 16px; color: #333;">
@@ -46,18 +31,27 @@ const sendEmail = async ({ email, username, otp }: OTPData) => {
                 <p>Thank you for registering on our platform. To complete your registration, please verify your account using the OTP below:</p>
                 <h3>${otp}</h3>
                 <p>If you did not request this, please ignore this email.</p>
-                <p>Best regards,<br>Blogging Site Official</p>
+                <p>Best regards,<br>Reels Media</p>
             </div>
         `;
 
-        const response = await transporter.sendMail({
+        const saltRounds = 10;
+
+        const hashedOTP = await bcrypt.hash(otp, saltRounds);
+
+        await UserOTP.create({
+            userId: _id,
+            otp: hashedOTP,
+            expiresAt: new Date(Date.now() + 60 * 1000)
+        })
+
+        await transporter.sendMail({
             from: configs.gmail_user_mail,
             subject: "Account Verification OTP",
             to: email,
             html: emailTemplate
         })
-        
-        return nextResponse(200, "Verification email sent successfully. Please check your inbox.");
+
     } catch (error) {
         console.log("Error at sending email ==>", error);
         return nextResponse(404, "Error sending verification email.");

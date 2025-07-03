@@ -33,12 +33,6 @@ const userSchema = new Schema<IUser>({
         required: true,
         unique: true,
     },
-    code: {
-        type: String,
-    },
-    codeExpiry: {
-        type: Date,
-    },
     isVerified: {
         type: Boolean,
         default: false,

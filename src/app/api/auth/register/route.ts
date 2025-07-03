@@ -2,6 +2,7 @@ import User from "@/models/user.model";
 import { usernameValidation } from "@/schemas/register.schema";
 import { dbConnect } from "@/utils/db.util";
 import { generateOtp } from "@/utils/generateOTP";
+import { nextResponse } from "@/utils/Response";
 import { sendEmail } from "@/utils/sendMail";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -39,18 +40,17 @@ export async function POST(req: NextRequest) {
             );
         }
 
-        await User.create({ email, password });
+        const user = await User.create({ email, password, username });
 
-        await sendEmail({ email, username, otp: generateOtp() });
+        if (!user) return nextResponse(500, "Failed to register user.");
 
-        // return NextResponse.json(
-        //     { message: "User created successfully", user },
-        //     { status: 201 }
-        // );
+        await sendEmail({ _id: user._id as string, email, username, otp: generateOtp() });
+
+        return nextResponse(200, "Verification email sent successfully. Please check your inbox.");
     } catch (error) {
         console.log("Error at user registration ==>", error);
         return NextResponse.json(
-            { error: "Failed to register user." },
+            { message: "Failed to register user." },
             { status: 500 }
         );
     }

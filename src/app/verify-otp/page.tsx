@@ -1,4 +1,6 @@
 "use client"
+import axios from 'axios';
+import { set } from 'mongoose';
 import React, { useState } from 'react'
 import OTPInput from 'react-otp-input';
 
@@ -14,11 +16,21 @@ const Input = ({ ...props }) => {
 
 const VerifyOtpPage = () => {
     const [otp, setOtp] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
 
 
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        console.log(otp);
+        setIsLoading(true);
+        try {
+            const res = await axios.post("/api/auth/verifyOTP", { otp });
+
+            console.log(res);
+        } catch (error) {
+            console.log(error);
+        } finally {
+            setIsLoading(false);
+        }
     }
 
     return (
@@ -42,17 +54,26 @@ const VerifyOtpPage = () => {
                     <div className="max-w-[260px] mx-auto mt-4">
                         <button
                             type="submit"
-                            className="w-full inline-flex justify-center whitespace-nowrap rounded-lg bg-primary-500 px-3.5 py-2.5 text-sm font-medium text-white shadow-sm shadow-primary-950/10 hover:bg-primary-600 focus:outline-none focus:ring focus:ring-primary-300 focus-visible:outline-none focus-visible:ring focus-visible:ring-primary-300 transition-colors duration-150"
+                            className="w-full inline-flex justify-center whitespace-nowrap rounded-lg bg-primary-500 px-3.5 py-2.5 text-sm font-medium text-white shadow-sm shadow-primary-950/10 hover:bg-primary-600 focus:outline-none focus:ring focus:ring-primary-300 focus-visible:outline-none focus-visible:ring focus-visible:ring-primary-300 transition-colors duration-150 cursor-pointer disabled:opacity-75 disabled:cursor-not-allowed"
+                            disabled={otp.length < 4}
                         >
-                            Verify Account
+                            {isLoading ? (
+                                <span className="flex items-center">
+                                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                    Verifying Account...
+                                </span>
+                            ) : 'Verify Account'}
                         </button>
                     </div>
                 </form>
                 <div className="text-sm text-slate-500 mt-4">
                     Didn't receive code?{" "}
-                    <a className="font-medium text-primary-500 hover:text-primary-600" href="#0" aria-disabled>
+                    <button className="font-medium text-primary-500 hover:text-primary-600 cursor-not-allowed">
                         Resend
-                    </a>
+                    </button>
                 </div>
             </div>
         </div>
