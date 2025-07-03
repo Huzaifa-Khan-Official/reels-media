@@ -4,6 +4,7 @@ import { dbConnect } from "@/utils/db.util";
 import { generateOtp } from "@/utils/generateOTP";
 import { nextResponse } from "@/utils/Response";
 import { sendEmail } from "@/utils/sendMail";
+import { signIn } from "next-auth/react";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {

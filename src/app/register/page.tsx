@@ -80,7 +80,7 @@ const RegisterPage = () => {
             });
 
             toast.success(res.data.message);
-            router.push(`/verify-otp`);
+            router.push("/verify-otp");
         } catch (error) {
             console.log(error);
             if (axios.isAxiosError(error)) {

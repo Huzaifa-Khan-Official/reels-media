@@ -1,8 +1,9 @@
 "use client"
 import axios from 'axios';
-import { set } from 'mongoose';
+import { useRouter } from 'next/navigation';
 import React, { useState } from 'react'
 import OTPInput from 'react-otp-input';
+import { toast } from 'react-toastify';
 
 const Input = ({ ...props }) => {
     return (
@@ -17,6 +18,7 @@ const Input = ({ ...props }) => {
 const VerifyOtpPage = () => {
     const [otp, setOtp] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const router = useRouter();
 
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -26,10 +28,24 @@ const VerifyOtpPage = () => {
             const res = await axios.post("/api/auth/verifyOTP", { otp });
 
             console.log(res);
+
+            toast.success(res.data.message);
+
+            router.push("/");
         } catch (error) {
-            console.log(error);
+            if (axios.isAxiosError(error)) toast.error(error.response?.data.message);
         } finally {
             setIsLoading(false);
+        }
+    }
+
+    const handleResendOtp = async () => {
+        try {
+            const res = await axios.post("/api/auth/resendOTP");
+
+            toast.success(res.data.message);
+        } catch (error) {
+            if (axios.isAxiosError(error)) toast.error(error.response?.data.message);
         }
     }
 
@@ -71,7 +87,7 @@ const VerifyOtpPage = () => {
                 </form>
                 <div className="text-sm text-slate-500 mt-4">
                     Didn't receive code?{" "}
-                    <button className="font-medium text-primary-500 hover:text-primary-600 cursor-not-allowed">
+                    <button onClick={handleResendOtp} className="font-medium text-primary-500 hover:text-primary-600 cursor-pointer">
                         Resend
                     </button>
                 </div>

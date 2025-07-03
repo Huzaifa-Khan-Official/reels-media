@@ -29,7 +29,8 @@ export const authOptions: NextAuthOptions = {
                     }
                     return {
                         id: user._id.toString(),
-                        email: user.email
+                        email: user.email,
+                        username: user.username,
                     };
                 } catch (error) {
                     console.log("Error at login ==>", error);
@@ -46,7 +47,7 @@ export const authOptions: NextAuthOptions = {
             return token;
         },
         async session({ session, token }) {
-            if (session) {
+            if (session.user) {
                 session.user.id = token.id as string;
             }
             return session;
