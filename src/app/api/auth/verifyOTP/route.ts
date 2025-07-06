@@ -7,15 +7,12 @@ import { getToken } from "next-auth/jwt";
 
 export async function POST(req: NextRequest) {
     try {
-        const token = await getToken({ req: req });
-        
-        const userId = token?.id;
-        const { otp } = await req.json();
+        const { otp, userId } = await req.json();
 
         if (!otp) {
             return nextResponse(400, "OTP is required");
         }
-        
+
         const verificationRecords = await UserOTP.find({ userId });
 
         if (verificationRecords.length === 0) {

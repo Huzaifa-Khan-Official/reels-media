@@ -1,6 +1,6 @@
 "use client"
 import axios from 'axios';
-import { useRouter } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import React, { useState } from 'react'
 import OTPInput from 'react-otp-input';
 import { toast } from 'react-toastify';
@@ -19,19 +19,18 @@ const VerifyOtpPage = () => {
     const [otp, setOtp] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
+    const { userId } = useParams();
 
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setIsLoading(true);
         try {
-            const res = await axios.post("/api/auth/verifyOTP", { otp });
-
-            console.log(res);
+            const res = await axios.post("/api/auth/verifyOTP", { otp, userId });
 
             toast.success(res.data.message);
 
-            router.push("/");
+            router.push("/login");
         } catch (error) {
             if (axios.isAxiosError(error)) toast.error(error.response?.data.message);
         } finally {

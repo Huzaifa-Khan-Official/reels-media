@@ -7,17 +7,14 @@ export default function Home() {
     try {
       (
         async () => {
-          const res = await axios.get("/api/auth/session", {
-            withCredentials: true
-          })
+          const res = await axios.get("/api/auth/session")
 
           console.log("res ==>", res);
         }
       )()
     } catch (error) {
-      console.log("error ==>", error);
+      if (axios.isAxiosError(error)) console.log("error ==>", error?.response?.data.message);
     }
-
   }, [])
   return (
     <div>

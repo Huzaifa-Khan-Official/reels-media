@@ -80,7 +80,7 @@ const RegisterPage = () => {
             });
 
             toast.success(res.data.message);
-            router.push("/verify-otp");
+            router.push(`/verify-otp/${res.data.data.id}`);
         } catch (error) {
             console.log(error);
             if (axios.isAxiosError(error)) {
@@ -194,8 +194,7 @@ const RegisterPage = () => {
                             <button
                                 type="submit"
                                 disabled={isLoading || !formData.username || !formData.email || !formData.password || !formData.confirmPassword}
-                                className={`flex w-full justify-center rounded-md bg-primary-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-primary-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600 disabled:opacity-70 disabled:cursor-not-allowed ${isLoading ? 'opacity-70 cursor-not-allowed' : 'cursor-pointer'
-                                    }`}
+                                className={`flex w-full justify-center rounded-md bg-primary-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-primary-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600 disabled:opacity-70 disabled:cursor-not-allowed ${isLoading ? 'opacity-70 cursor-not-allowed' : 'cursor-pointer'}`}
                             >
                                 {isLoading ? (
                                     <span className="flex items-center">
