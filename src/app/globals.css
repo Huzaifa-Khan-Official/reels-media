@@ -3,7 +3,6 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
-  /* --primaryColor: oklch(51.1% 0.262 276.966); */
   --color-primary-50: oklch(0.962 0.018 272.314);
   --color-primary-100: oklch(0.93 0.034 272.788);
   --color-primary-200: oklch(0.87 0.065 274.039);
@@ -62,4 +61,40 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+@layer components {
+  .card-body {
+    @apply p-5;
+  }
+
+  .card {
+    @apply dark:bg-black/90 bg-primary-100 rounded-lg shadow-lg hover:bg-primary-200 hover:dark:bg-primary-950;
+  }
+
+  .card-title {
+    @apply text-2xl font-bold mb-2;
+  }
+
+  .card-actions {
+    @apply flex justify-end;
+  }
+
+  .stat-value {
+    @apply text-3xl font-bold text-primary-600;
+  }
+
+  .btn-primary {
+    @apply bg-primary-600 text-white hover:bg-primary-700 cursor-pointer py-1.5 px-4 rounded my-2;
+  }
+
+  .alert {
+    @apply p-4 mb-4 text-sm text-primary-700 bg-primary-100 rounded-lg dark:bg-primary-200 dark:text-primary-800;
+  }
+
+  .avatar {
+    @apply rounded-full flex justify-center items-center bg-primary-500;
+
+    
+  }
 }

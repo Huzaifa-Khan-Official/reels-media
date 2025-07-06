@@ -72,9 +72,9 @@ const LoginPage = () => {
                                     Password
                                 </label>
                                 <div className="text-sm">
-                                    <a href="#" className="font-semibold text-primary-600 hover:text-primary-500">
+                                    <button className="font-semibold text-primary-600 hover:text-primary-500 cursor-not-allowed">
                                         Forgot password?
-                                    </a>
+                                    </button>
                                 </div>
                             </div>
                             <div className="mt-2">
@@ -94,7 +94,8 @@ const LoginPage = () => {
                         <div>
                             <button
                                 type="submit"
-                                className={`flex w-full justify-center rounded-md bg-primary-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-primary-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600 cursor-pointer ${isLoading ? 'opacity-70 cursor-not-allowed' : 'cursor-pointer'}`}
+                                disabled={!email || !password}
+                                className={`flex w-full justify-center rounded-md bg-primary-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-primary-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600 cursor-pointer ${isLoading || !email || !password ? 'opacity-70 cursor-not-allowed' : 'cursor-pointer'}`}
                             >
                                 {isLoading ? (
                                     <span className="flex items-center">
