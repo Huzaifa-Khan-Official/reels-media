@@ -1,19 +1,21 @@
 "use client"
 
 import { configs } from "@/constants/configs";
-import {
-    ImageKitAbortError,
-    ImageKitInvalidRequestError,
-    ImageKitServerError,
-    ImageKitUploadNetworkError,
-    upload,
-} from "@imagekit/next";
-import axios from "axios";
-import { useRef, useState } from "react";
+import { asyncHandlerFront } from "@/lib/asyncHandlerFront";
+import { apiClient } from "@/utils/api-client";
+import { upload} from "@imagekit/next";
+import { useState } from "react";
 import { toast } from "react-toastify";
 
+interface ImageKitUploadResponse {
+    fileId: string;
+    url: string
+    thumbnailUrl: string;
+    name: string;
+}
+
 interface FileUploadProps {
-    onSuccess: (res: any) => void;
+    onSuccess: (res: ImageKitUploadResponse) => void;
     onProgress?: (progress: number) => void;
     fileType?: "image" | "video";
 }
@@ -48,33 +50,43 @@ const FileUpload = ({
         setUploading(true);
         setError(null);
 
-        try {
-            const authRes = await axios.get("/api/auth/imagekit-auth");
+        await asyncHandlerFront(
+            async () => {
+                const authRes = await apiClient.imageKitAuth();
 
-            const { token, signature, expire } = authRes.data;
+                const { token, signature, expire } = authRes.data;
 
-            const res = await upload({
-                file,
-                fileName: file.name,
-                publicKey: configs.imageKitPublicKey,
-                signature,
-                expire,
-                token,
-                onProgress: (event) => {
-                    if(event.lengthComputable && onProgress) {
-                        const percent = Math.round((event.loaded / event.total) * 100);
+                const res = await upload({
+                    file,
+                    fileName: file.name,
+                    publicKey: configs.imageKitPublicKey,
+                    signature,
+                    expire,
+                    token,
+                    onProgress: (event) => {
+                        if (event.lengthComputable && onProgress) {
+                            const percent = Math.round((event.loaded / event.total) * 100);
 
-                        onProgress(percent); 
+                            onProgress(percent);
+                        }
                     }
-                }
-            });
+                });
 
-            onSuccess(res);
-        } catch (error) {
-            toast.error("Upload failed, please try again.");
-        } finally {
-            setUploading(false);
-        }
+                if (!res.url || !res.name || !res.fileId) {
+                    throw new Error("Upload failed: missing required fields in response.");
+                }
+                onSuccess({
+                    fileId: res.fileId as string,
+                    url: res.url as string,
+                    thumbnailUrl: res.thumbnailUrl as string,
+                    name: res.name as string,
+                });
+            },
+            (err) => {
+                toast.error(error || err.message);
+            }
+        );
+        setUploading(false);
     }
 
     return (

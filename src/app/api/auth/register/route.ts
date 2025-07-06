@@ -1,11 +1,12 @@
 import User from "@/models/user.model";
 import { usernameValidation } from "@/schemas/register.schema";
+import { ApiError } from "@/utils/ApiError";
 import { asyncHandler } from "@/utils/asyncHandler";
 import { dbConnect } from "@/utils/db.util";
 import { generateOtp } from "@/utils/generateOTP";
 import { nextResponse } from "@/utils/Response";
 import { sendEmail } from "@/utils/sendMail";
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 
 export const POST = asyncHandler(
     async (req: NextRequest) => {
@@ -17,7 +18,7 @@ export const POST = asyncHandler(
 
         if (!checkUsernameUniqueness.success) {
             console.log("Error at username validation ==>", checkUsernameUniqueness.error);
-            return nextResponse(400, "Invalid username");
+            throw new ApiError(400, "Invalid username");
         }
 
         await dbConnect();
@@ -25,12 +26,14 @@ export const POST = asyncHandler(
         const existingUser = await User.findOne({ email });
 
         if (existingUser) {
-            return nextResponse(400, "User already exists");
+            throw new ApiError(400, "User already exists");
         }
 
         const user = await User.create({ username, email, password });
 
-        if (!user) return nextResponse(500, "Failed to register user.");
+        if (!user) {
+            throw new ApiError(500, "Failed to register user.");
+        }
 
         await sendEmail({ _id: user._id as string, email, username: user.username, otp: generateOtp() });
 

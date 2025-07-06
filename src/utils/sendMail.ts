@@ -1,8 +1,8 @@
 import { configs } from "@/constants/configs";
 import nodemailer from "nodemailer";
-import { nextResponse } from "./Response"
 import UserOTP from "@/models/userOTP.model";
 import bcrypt from "bcryptjs";
+import { ApiError } from "./ApiError";
 
 const transporter = nodemailer.createTransport({
     service: "Gmail",
@@ -22,7 +22,7 @@ interface OTPData {
     otp: string;
 }
 
-const sendEmail = async ({  _id, email, username, otp }: OTPData) => {
+const sendEmail = async ({ _id, email, username, otp }: OTPData) => {
     try {
         const emailTemplate = `
             <div style="font-family: Arial, sans-serif; font-size: 16px; color: #333;">
@@ -42,7 +42,7 @@ const sendEmail = async ({  _id, email, username, otp }: OTPData) => {
         await UserOTP.create({
             userId: _id,
             otp: hashedOTP,
-            expiresAt: new Date(Date.now() + 60 * 1000)
+            expiresAt: new Date(Date.now() + 2 * 60 * 1000) // 2 minutes from now
         })
 
         await transporter.sendMail({
@@ -51,10 +51,9 @@ const sendEmail = async ({  _id, email, username, otp }: OTPData) => {
             to: email,
             html: emailTemplate
         })
-
     } catch (error) {
         console.log("Error at sending email ==>", error);
-        return nextResponse(404, "Error sending verification email.");
+        throw new ApiError(500, "Failed to send verification email.");
     }
 }
 

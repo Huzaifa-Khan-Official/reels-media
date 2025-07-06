@@ -1,17 +1,17 @@
-export interface IApiResponse {
+export interface IApiResponse<T = unknown> {
     statusCode?: number;
     message: string;
-    data?: any;
+    data?: T;
 }
 
-export class ApiResponse implements IApiResponse {
+export class ApiResponse<T = unknown> implements IApiResponse<T> {
     statusCode?: number;
     message: string;
-    data?: any;
+    data?: T;
 
-    constructor(statusCode: number, message = "Success", data?: any) {
+    constructor(statusCode: number, message = "Success", data?: T) {
         this.statusCode = statusCode;
         this.message = message;
-        this.data = data || null;
+        this.data = data;
     }
 }

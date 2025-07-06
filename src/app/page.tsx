@@ -1,20 +1,21 @@
 "use client"
-import axios from "axios";
+import { asyncHandlerFront } from "@/lib/asyncHandlerFront";
+import { apiClient } from "@/utils/api-client";
 import { useEffect } from "react";
 
 export default function Home() {
   useEffect(() => {
-    try {
-      (
-        async () => {
-          const res = await axios.get("/api/auth/session")
+    ; (
+      async () => {
+        await asyncHandlerFront(async () => {
+          const res = await apiClient.getToken();
 
           console.log("res ==>", res);
-        }
-      )()
-    } catch (error) {
-      if (axios.isAxiosError(error)) console.log("error ==>", error?.response?.data.message);
-    }
+        }, (error) => {
+          console.log("error ==>", error.message);
+        })
+      }
+    )()
   }, [])
   return (
     <div>

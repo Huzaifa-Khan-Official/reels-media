@@ -1,11 +1,10 @@
 "use client"
-import axios from 'axios';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react'
 import { toast } from 'react-toastify';
-import * as z from 'zod';
-import { registerSchema } from '@/schemas/register.schema';
+import { apiClient } from '@/utils/api-client';
+import { asyncHandlerFront } from '@/lib/asyncHandlerFront';
 
 const RegisterPage = () => {
     const [formData, setFormData] = useState({
@@ -34,62 +33,23 @@ const RegisterPage = () => {
         }
     }
 
-    const validateForm = () => {
-        const newErrors: Record<string, string> = {};
-
-        if (formData.password !== formData.confirmPassword) {
-            newErrors.confirmPassword = "Passwords do not match";
-        }
-
-        try {
-            registerSchema.parse({
-                username: formData.username,
-                email: formData.email,
-                password: formData.password
-            });
-        } catch (error) {
-            if (error instanceof z.ZodError) {
-                error.errors.forEach(err => {
-                    const path = err.path[0];
-                    if (path) {
-                        newErrors[path] = err.message;
-                    }
-                });
-            }
-        }
-
-        setErrors(newErrors);
-
-        return Object.keys(newErrors).length === 0;
-    }
-
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setIsLoading(true);
 
-        if (!validateForm()) {
-            setIsLoading(false);
-            return;
-        }
+        await asyncHandlerFront(
+            async () => {
+                const res = await apiClient.register({ email: formData.email, password: formData.password, username: formData.username });
 
-        try {
-            const res = await axios.post("/api/auth/register", {
-                email: formData.email,
-                password: formData.password,
-                username: formData.username
-            });
-
-            toast.success(res.data.message);
-            router.push(`/verify-otp/${res.data.data.id}`);
-        } catch (error) {
-            console.log(error);
-            if (axios.isAxiosError(error)) {
-                toast.error(error.response?.data.message);
+                toast.success(res.message);
+                router.push(`/verify-otp/${res.data.id}`);
+            }, (error) => {
+                toast.error(error.message);
             }
-        } finally {
-            setIsLoading(false);
-        }
-    }
+        );
+
+        setIsLoading(false);
+    };
 
     return (
         <div>

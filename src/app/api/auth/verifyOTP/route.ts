@@ -3,32 +3,35 @@ import { NextRequest } from "next/server";
 import UserOTP from "@/models/userOTP.model";
 import User from "@/models/user.model";
 import bcrypt from "bcryptjs";
-import { getToken } from "next-auth/jwt";
+import { asyncHandler } from "@/utils/asyncHandler";
+import { dbConnect } from "@/utils/db.util";
+import { ApiError } from "@/utils/ApiError";
 
-export async function POST(req: NextRequest) {
-    try {
+export const POST = asyncHandler(
+    async (req: NextRequest) => {
         const { otp, userId } = await req.json();
 
-        if (!otp) {
-            return nextResponse(400, "OTP is required");
-        }
+        if (!otp) throw new ApiError(400, "OTP is required");
+
+        await dbConnect();
 
         const verificationRecords = await UserOTP.find({ userId });
 
         if (verificationRecords.length === 0) {
-            return nextResponse(404, "No OTP record found. Please request a new OTP.");
+            throw new ApiError(404, "No OTP record found. Please request a new OTP.");
         }
 
         const { expiresAt, otp: hashedOTP } = verificationRecords[0];
 
         if (expiresAt < new Date()) {
             await UserOTP.deleteMany({ userId });
-            return nextResponse(400, "OTP has expired. Please request a new one.");
+            throw new ApiError(400, "OTP has expired. Please request a new one.");
         }
 
         const isOTPValid = await bcrypt.compare(otp, hashedOTP);
+
         if (!isOTPValid) {
-            return nextResponse(400, "Invalid OTP. Please try again.");
+            throw new ApiError(400, "Invalid OTP. Please try again.");
         }
 
         await User.findByIdAndUpdate(
@@ -40,7 +43,5 @@ export async function POST(req: NextRequest) {
         await UserOTP.deleteMany({ userId });
 
         return nextResponse(200, "OTP verified successfully");
-    } catch (error) {
-        return nextResponse(500, "Failed to verify OTP");
     }
-}
+)

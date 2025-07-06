@@ -1,5 +1,6 @@
 "use client"
-import axios from 'axios';
+import { asyncHandlerFront } from '@/lib/asyncHandlerFront';
+import { apiClient } from '@/utils/api-client';
 import { useParams, useRouter } from 'next/navigation';
 import React, { useState } from 'react'
 import OTPInput from 'react-otp-input';
@@ -17,35 +18,42 @@ const Input = ({ ...props }) => {
 
 const VerifyOtpPage = () => {
     const [otp, setOtp] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [isSending, setIsSending] = useState<boolean>(false);
     const router = useRouter();
     const { userId } = useParams();
-
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setIsLoading(true);
-        try {
-            const res = await axios.post("/api/auth/verifyOTP", { otp, userId });
 
-            toast.success(res.data.message);
+        await asyncHandlerFront(
+            async () => {
+                const res = await apiClient.verifyOTP(otp, userId as string);
+                toast.success(res.message);
+                router.push("/login");
+            },
+            (error) => {
+                toast.error(error.message);
+            }
+        );
 
-            router.push("/login");
-        } catch (error) {
-            if (axios.isAxiosError(error)) toast.error(error.response?.data.message);
-        } finally {
-            setIsLoading(false);
-        }
-    }
+        setIsLoading(false);
+    };
+
 
     const handleResendOtp = async () => {
-        try {
-            const res = await axios.post("/api/auth/resendOTP");
-
-            toast.success(res.data.message);
-        } catch (error) {
-            if (axios.isAxiosError(error)) toast.error(error.response?.data.message);
-        }
+        setIsSending(true);
+        await asyncHandlerFront(
+            async () => {
+                const res = await apiClient.resendOTP(userId as string);
+                toast.success(res.message);
+            },
+            (error) => {
+                toast.error(error.message);
+            }
+        );
+        setIsSending(false);
     }
 
     return (
@@ -55,6 +63,9 @@ const VerifyOtpPage = () => {
                     <h1 className="text-2xl font-bold mb-1">Mobile Phone Verification</h1>
                     <p className="text-[15px] text-slate-500">
                         Enter the 4-digit verification code that was sent to your phone number.
+                    </p>
+                    <p className='text-[15px] text-slate-500'>
+                        Code will expire in 2 minutes
                     </p>
                 </header>
                 <form id="otp-form" onSubmit={handleSubmit}>
@@ -85,9 +96,9 @@ const VerifyOtpPage = () => {
                     </div>
                 </form>
                 <div className="text-sm text-slate-500 mt-4">
-                    Didn't receive code?{" "}
-                    <button onClick={handleResendOtp} className="font-medium text-primary-500 hover:text-primary-600 cursor-pointer">
-                        Resend
+                    Didn&apos;t receive code?{" "}
+                    <button onClick={handleResendOtp} className={`font-medium text-primary-500 hover:text-primary-600 cursor-pointer ${isSending ? "opacity-50 cursor-not-allowed" : ""}`}>
+                        {isSending ? "Sending..." : "Resend"}
                     </button>
                 </div>
             </div>

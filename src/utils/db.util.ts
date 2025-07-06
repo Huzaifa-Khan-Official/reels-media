@@ -1,6 +1,5 @@
 import { configs } from "@/constants/configs";
 import mongoose from "mongoose";
-import { buffer } from "stream/consumers";
 
 if (!configs.mongodbUri) {
     throw new Error("MONGODB_URI is not defined");
