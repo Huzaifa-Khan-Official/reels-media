@@ -13,8 +13,9 @@ import ProfileTab from "@/components/ProfileTab"
 type TabType = "home" | "videos" | "notifications" | "messages" | "create" | "profile"
 
 export default function ProfilePage() {
-    const [activeTab, setActiveTab] = useState<TabType>("home")
-    const [sidebarOpen, setSidebarOpen] = useState<boolean>(false)
+    const [activeTab, setActiveTab] = useState<TabType>("home");
+    const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
+    const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
 
     const tabs = [
         { id: "home" as TabType, label: "Home", icon: Home },
@@ -35,8 +36,8 @@ export default function ProfilePage() {
                 return <NotificationsTab />
             case "messages":
                 return <MessagesTab />
-            case "create":
-                return <CreateTab />
+            // case "create":
+            //     return <CreateTab />
             case "profile":
                 return <ProfileTab />
             default:
@@ -66,9 +67,18 @@ export default function ProfilePage() {
                             return (
                                 <button
                                     key={tab.id}
+                                    // onClick={() => {
+                                    //     setActiveTab(tab.id)
+                                    //     setSidebarOpen(false)
+                                    // }}
+
                                     onClick={() => {
-                                        setActiveTab(tab.id)
-                                        setSidebarOpen(false)
+                                        if (tab.id === "create") {
+                                            setIsCreateModalOpen(true)
+                                        } else {
+                                            setActiveTab(tab.id)
+                                            setSidebarOpen(false)
+                                        }
                                     }}
                                     className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors cursor-pointer ${activeTab === tab.id ? "bg-primary-500 text-white hover:bg-primary-600" : "hover:bg-primary-600 hover:text-white/95"
                                         }`}
@@ -91,6 +101,12 @@ export default function ProfilePage() {
             <div className="lg:ml-64">
                 <main className="min-h-screen dark:bg-black/80 dark:text-white/70">{renderTabContent()}</main>
             </div>
+
+            <CreateTab
+                isModalOpen={isCreateModalOpen}
+                setIsModalOpen={setIsCreateModalOpen}
+            />
+
         </div>
     )
 }
