@@ -56,7 +56,7 @@ export default function ProfilePage() {
 
             {/* Sidebar */}
             <div
-                className={`fixed inset-y-0 left-0 z-40 w-64  dark:bg-black/100 dark:text-white/80 shadow-xl transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"
+                className={`fixed inset-y-0 left-0 z-40 w-64 bg-black/100 text-white/80 lg:text-black lg:bg-primary-50 dark:bg-black/100 dark:text-white/80 shadow-xl transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"
                     }`}
             >
                 <div className="p-6">
@@ -67,11 +67,6 @@ export default function ProfilePage() {
                             return (
                                 <button
                                     key={tab.id}
-                                    // onClick={() => {
-                                    //     setActiveTab(tab.id)
-                                    //     setSidebarOpen(false)
-                                    // }}
-
                                     onClick={() => {
                                         if (tab.id === "create") {
                                             setIsCreateModalOpen(true)
@@ -94,7 +89,7 @@ export default function ProfilePage() {
 
             {/* Overlay for mobile */}
             {sidebarOpen && (
-                <div className="fixed inset-0 bg-black/90 bg-opacity-50 z-30 lg:hidden text-white" onClick={() => setSidebarOpen(false)} />
+                <div className="fixed inset-0 bg-black/50 bg-opacity-50 z-30 lg:hidden text-white" onClick={() => setSidebarOpen(false)} />
             )}
 
             {/* Main content */}

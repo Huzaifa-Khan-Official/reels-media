@@ -67,7 +67,7 @@ body {
   }
 
   .card {
-    @apply dark:bg-black/90 bg-primary-100 rounded-lg shadow-lg hover:bg-primary-200 hover:dark:bg-primary-950;
+    @apply dark:bg-black/90 bg-primary-50 rounded-lg shadow-lg hover:bg-primary-100 hover:dark:bg-primary-950;
   }
 
   .card-title {
