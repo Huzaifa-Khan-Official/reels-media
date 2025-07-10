@@ -29,7 +29,7 @@ const mockReels: Reel[] = [
     thumbnail: "/placeholder.svg?height=800&width=450",
     user: {
       username: "johndoe",
-      avatar: "/placeholder.svg?height=40&width=40",
+      avatar: "/placeholder.svg",
       isVerified: true,
     },
     description: "Amazing sunset timelapse from my rooftop! 🌅 #sunset #timelapse #photography",
@@ -45,7 +45,7 @@ const mockReels: Reel[] = [
     thumbnail: "/placeholder.svg?height=800&width=450",
     user: {
       username: "creativestudio",
-      avatar: "/placeholder.svg?height=40&width=40",
+      avatar: "/placeholder.svg",
       isVerified: false,
     },
     description: "Quick design tutorial: Creating smooth animations in Figma ✨ Follow for more tips!",
@@ -61,7 +61,7 @@ const mockReels: Reel[] = [
     thumbnail: "/placeholder.svg?height=800&width=450",
     user: {
       username: "foodielove",
-      avatar: "/placeholder.svg?height=40&width=40",
+      avatar: "/placeholder.svg",
       isVerified: true,
     },
     description: "Perfect pasta recipe in 60 seconds! 🍝 Save this for later #cooking #pasta #recipe",
@@ -77,7 +77,7 @@ const mockReels: Reel[] = [
     thumbnail: "/placeholder.svg?height=800&width=450",
     user: {
       username: "techreview",
-      avatar: "/placeholder.svg?height=40&width=40",
+      avatar: "/placeholder.svg",
       isVerified: true,
     },
     description: "iPhone 15 Pro Max camera test - the results will shock you! 📱 #tech #iphone #camera",
@@ -93,7 +93,7 @@ const mockReels: Reel[] = [
     thumbnail: "/placeholder.svg?height=800&width=450",
     user: {
       username: "fitnessjourney",
-      avatar: "/placeholder.svg?height=40&width=40",
+      avatar: "/placeholder.svg",
       isVerified: false,
     },
     description: "5-minute morning workout routine 💪 No equipment needed! #fitness #workout #morning",
