@@ -1,42 +1,161 @@
 import Video, { IVideo } from "@/models/video.model";
+import { ApiError } from "@/utils/ApiError";
+import { asyncHandler } from "@/utils/asyncHandler";
 import { authOptions } from "@/utils/authOptions.util";
 import { dbConnect } from "@/utils/db.util";
+import { nextResponse } from "@/utils/Response";
 import { getServerSession } from "next-auth";
+import mongoose from "mongoose";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function GET() {
-    try {
+export const GET = asyncHandler(
+    async (): Promise<NextResponse> => {
         await dbConnect();
 
-        const videos = await Video.find({}).sort({ createdAt: -1 }).lean();
+        const session = await getServerSession(authOptions);
 
-        if (!videos || videos.length === 0) {
-            return NextResponse.json([], { status: 200 });
+        const loggedInUserId = session?.user.id;
+
+        // const videos = await Video.find({}).sort({ createdAt: -1 }).lean();
+
+        const videos = await Video.aggregate([
+            {
+                $sort: {
+                    createdAt: -1
+                }
+            },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "userId",
+                    foreignField: "_id",
+                    as: "owner"
+                }
+            },
+            {
+                $lookup: {
+                    from: "likes",
+                    localField: "_id",
+                    foreignField: "video",
+                    as: "likes"
+                }
+            },
+            {
+                $addFields: {
+                    likes: {
+                        $size: {
+                            $ifNull: ["$likes", []]
+                        }
+                    },
+                    likedUserIds: {
+                        $map: {
+                            input: "$likes",
+                            as: "like",
+                            in: "$$like.userId"
+                        }
+                    }
+                }
+            },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "likedUserIds",
+                    foreignField: "_id",
+                    as: "likedUsersInfo"
+                }
+            },
+            ...(loggedInUserId ? [
+                {
+                    $lookup: {
+                        from: "subscribes",
+                        let: { videoOwner: "$userId" },
+                        pipeline: [{
+                            $match: {
+                                $expr: {
+                                    $and: [
+                                        { $eq: ["$subscribedTo", "$$videoOwner"] },
+                                        { $eq: ["$subscriber", new mongoose.Types.ObjectId(loggedInUserId)] }
+                                    ]
+                                }
+                            }
+                        }],
+                        as: "subscriptionInfo"
+                    }
+                },
+                {
+                    $addFields: {
+                        isSubscribed: {
+                            $cond: {
+                                if: {
+                                    $gt: [{ $size: "$subscriptionInfo" }, 0],
+                                    then: true,
+                                    else: false
+                                }
+                            }
+                        }
+                    }
+                }
+            ] : [
+                {
+                    $addFields: {
+                        isSubscribed: false
+                    }
+                }
+            ]),
+            {
+                $project: {
+                    owner: {
+                        $map: {
+                            input: "$owner",
+                            as: "o",
+                            in: {
+                                username: "$$o.username",
+                                profilePic: "$$o.profilePic"
+                            }
+                        }
+                    },
+                    likedUsers: {
+                        $map: {
+                            input: "$likedUsersInfo",
+                            as: "o",
+                            in: {
+                                username: "$$o.username",
+                                profilePic: "$$o.profilePic"
+                            }
+                        }
+                    },
+                    videoUrl: 1,
+                    views: 1,
+                    likes: 1,
+                    user: 1,
+                    isSubscribed: 1
+                }
+            }
+        ]);
+
+        if (!videos) {
+            throw new ApiError(500, "Failed to fetch videos");
         }
 
-        return NextResponse.json(videos, { status: 200 });
-
-    } catch (error) {
-        console.log("Error at getting videos ==>", error);
-        return NextResponse.json({ error: "Failed to get videos" }, { status: 500 });
+        return nextResponse(200, "Videos fetched successfully", videos);
     }
-}
+)
 
-export async function POST(req: NextRequest) {
-    try {
+export const POST = asyncHandler(
+    async (req: NextRequest): Promise<NextResponse> => {
         const session = await getServerSession(authOptions);
 
         if (!session) {
-            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+            throw new ApiError(401, "Please sign in first to post a reply!");
         }
-
-        await dbConnect();
 
         const body: IVideo = await req.json();
 
         if (!body.title || !body.description || !body.videoUrl || !body.thumbnailUrl) {
-            return NextResponse.json({ error: "Missing required fields." }, { status: 400 });
+            throw new ApiError(400, "Missing required fields.");
         }
+
+        await dbConnect();
 
         const videoData = {
             ...body,
@@ -50,9 +169,10 @@ export async function POST(req: NextRequest) {
 
         const newVideo = await Video.create(videoData);
 
-        return NextResponse.json(newVideo, { status: 200 });
-    } catch (error) {
-        console.log("Error at creating video ==>", error);
-        return NextResponse.json({ error: "Failed to create video" }, { status: 500 });
+        if (!newVideo) {
+            throw new ApiError(500, "Failed to create video");
+        }
+
+        return nextResponse(200, "Video created successfully", newVideo);
     }
-}
+)
