@@ -9,11 +9,17 @@ export const Video_Dimensions = {
 
 export interface IVideo {
     _id?: mongoose.Types.ObjectId;
+    userId: mongoose.Types.ObjectId;
     title: string;
     description: string;
     videoUrl: string;
     thumbnailUrl: string;
     controls?: boolean;
+    views?: number;
+    likes?: number;
+    comments?: number;
+    shares?: number;
+    isPublic?: boolean;
     transformation?: {
         height: number;
         width: number;
@@ -59,6 +65,31 @@ const videoSchema = new Schema<IVideo>({
             max: 100,
         },
     },
+    isPublic: {
+        type: Boolean,
+        default: false,
+    },
+    views: {
+        type: Number,
+        default: 0,
+    },
+    likes: {
+        type: Number,
+        default: 0,
+    },
+    comments: {
+        type: Number,
+        default: 0,
+    },
+    shares: {
+        type: Number,
+        default: 0,
+    },
+    userId: {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+        index: true
+    }
 }, {
     timestamps: true,
 });

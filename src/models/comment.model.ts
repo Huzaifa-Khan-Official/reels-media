@@ -4,8 +4,11 @@ const { Schema, model, models } = mongoose;
 
 export interface IComment {
     comment: string;
-    user: mongoose.Types.ObjectId;
-    video: mongoose.Types.ObjectId;
+    parentCommentId?: mongoose.Types.ObjectId;
+    userId: mongoose.Types.ObjectId;
+    videoId: mongoose.Types.ObjectId;
+    createdAt?: Date;
+    updatedAt?: Date;
 }
 
 const commentSchema = new Schema<IComment>({
@@ -13,17 +16,22 @@ const commentSchema = new Schema<IComment>({
         type: String,
         required: [true, "Comment is required"],
     },
-    user: {
+    userId: {
         type: Schema.Types.ObjectId,
         ref: "User",
         index: true
     },
-    video: {
+    videoId: {
         type: Schema.Types.ObjectId,
         ref: "Video",
         index: true
+    },
+    parentCommentId: {
+        type: Schema.Types.ObjectId,
+        ref: "Comment",
+        default: null
     }
-});
+}, { timestamps: true });
 
 const Comment = models?.Comment || model<IComment>("Comment", commentSchema);
 
