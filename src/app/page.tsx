@@ -4,6 +4,7 @@ import { useEffect } from "react"
 import { asyncHandlerFront } from "@/lib/asyncHandlerFront";
 import { apiClient } from "@/utils/api-client";
 import ReelComponent from "@/components/ReelComponent";
+import Link from "next/link";
 
 export default function Home() {
 
@@ -30,8 +31,8 @@ export default function Home() {
               <h2 className="dark:text-white text-black text-2xl sm:text-3xl">Reels Media</h2>
             </div>
             <div className="flex flex-row gap-2">
-              <button className="btn-primary">Login</button>
-              <button className="btn-primary">Signup</button>
+              <Link href="/login" className="btn-primary">Login</Link>
+              <Link href="/register" className="btn-primary">Signup</Link>
             </div>
           </div>
         </div>

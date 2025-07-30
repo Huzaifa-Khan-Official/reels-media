@@ -33,15 +33,19 @@ const LoginPage = () => {
     }
 
     return (
-        <div>
-            <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
+        <div className='dark:bg-black/90 '>
+            <div className="flex min-h-screen flex-1 flex-col justify-center px-6 py-12 lg:px-8 ">
                 <div className="sm:mx-auto sm:w-full sm:max-w-sm">
                     {/* <img
                         alt="Your Company"
                         src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=600"
                         className="mx-auto h-10 w-auto"
                     /> */}
-                    <h2 className="mt-10 text-center text-2xl/9 font-bold tracking-tight text-gray-900">
+                    {/* Logo */}
+                    <h1 className='text-center text-3xl/9 font-bold tracking-tight text-gray-900 dark:text-white'>
+                        Reels Media
+                    </h1>
+                    <h2 className="mt-10 text-center text-2xl/9 font-bold tracking-tight text-gray-900 dark:text-white">
                         Sign in to your account
                     </h2>
                 </div>
@@ -49,7 +53,7 @@ const LoginPage = () => {
                 <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
                     <form onSubmit={handleSubmit} className="space-y-6">
                         <div>
-                            <label htmlFor="email" className="block text-sm/6 font-medium text-gray-900">
+                            <label htmlFor="email" className="block text-sm/6 font-medium text-gray-900 dark:text-white">
                                 Email address
                             </label>
                             <div className="mt-2">
@@ -68,7 +72,7 @@ const LoginPage = () => {
 
                         <div>
                             <div className="flex items-center justify-between">
-                                <label htmlFor="password" className="block text-sm/6 font-medium text-gray-900">
+                                <label htmlFor="password" className="block text-sm/6 font-medium text-gray-900 dark:text-white">
                                     Password
                                 </label>
                                 <div className="text-sm">
@@ -110,7 +114,7 @@ const LoginPage = () => {
                         </div>
                     </form>
 
-                    <p className="mt-10 text-center text-sm/6 text-gray-500">
+                    <p className="mt-10 text-center text-sm/6 text-gray-500 dark:text-white/80">
                         Not a member?{' '}
                         <Link href="/register" className="font-semibold text-primary-600 hover:text-primary-500">
                             Sign up
