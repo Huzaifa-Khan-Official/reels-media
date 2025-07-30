@@ -1,4 +1,4 @@
-import Comment from "@/models/comment.model";
+import Comment, { CommentWithReplies, IComment } from "@/models/comment.model";
 import { ApiError } from "@/utils/ApiError";
 import { asyncHandler } from "@/utils/asyncHandler";
 import { authOptions } from "@/utils/authOptions.util";
@@ -7,22 +7,22 @@ import { nextResponse } from "@/utils/Response";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 
-export const buildCommentTree = (comments: any) => {
-    const map = new Map<string, any>();
-    const roots: any[] = [];
+export const buildCommentTree = (comments: IComment[]): CommentWithReplies[] => {
+    const map = new Map<string, CommentWithReplies>();
+    const roots: CommentWithReplies[] = [];
 
-    comments.forEach((comment: any) => {
-        map.set(comment._id, { ...comment, replies: [] });
+    comments.forEach((comment) => {
+        map.set(comment._id!.toString(), { ...comment, replies: [] });
     });
 
-    comments.forEach((comment: any) => {
-        if (comment.replyTo) {
-            const parent = map.get(comment.replyTo);
+    comments.forEach((comment) => {
+        if (comment.parentCommentId) {
+            const parent = map.get(comment.parentCommentId.toString());
             if (parent) {
-                parent.replies.push(comment);
+                parent.replies.push(map.get(comment._id!.toString())!);
             }
         } else {
-            roots.push(comment);
+            roots.push(map.get(comment._id!.toString())!);
         }
     });
 
@@ -43,9 +43,9 @@ export const GET = asyncHandler(
 
         await dbConnect();
 
-        const comments = await Comment.find({ video: videoId }).sort({ createdAt: -1 });
+        const comments = await Comment.find({ videoId }).sort({ createdAt: -1 });
 
-        if (!comments) {
+        if (!comments || comments.length === 0) {
             throw new ApiError(404, "Comments not found");
         }
 

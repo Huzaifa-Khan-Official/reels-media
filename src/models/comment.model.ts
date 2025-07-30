@@ -3,12 +3,17 @@ import mongoose from "mongoose";
 const { Schema, model, models } = mongoose;
 
 export interface IComment {
+    _id?: mongoose.Types.ObjectId;
     comment: string;
     parentCommentId?: mongoose.Types.ObjectId;
     userId: mongoose.Types.ObjectId;
     videoId: mongoose.Types.ObjectId;
     createdAt?: Date;
     updatedAt?: Date;
+}
+
+export interface CommentWithReplies extends IComment {
+    replies: CommentWithReplies[]
 }
 
 const commentSchema = new Schema<IComment>({

@@ -1,6 +1,5 @@
 "use client"
 
-import type { Reel } from "@/app/page"
 import { Heart, MessageCircle, Share, Bookmark, MoreHorizontal, Play, VolumeX, Volume2 } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 import CommentModal from "./CommentModal"
@@ -83,7 +82,7 @@ const ReelItem = ({ reel, isActive }: { reel: Reel; isActive: boolean }) => {
 
   return (
     <>
-      <div className="relative w-full h-screen bg-black flex items-center justify-center overflow-hidden">
+      <div className="relative w-full h-full bg-black flex items-center justify-center overflow-hidden">
         {/* Video */}
         <video
           ref={videoRef}
@@ -103,14 +102,6 @@ const ReelItem = ({ reel, isActive }: { reel: Reel; isActive: boolean }) => {
               <Play className="w-12 h-12 text-white fill-white" />
             </div>
           )}
-        </div>
-
-        {/* Top Controls */}
-        <div className="absolute top-4 left-4 right-4 flex justify-between items-center z-10">
-          <div className="text-white font-semibold text-lg">Reels</div>
-          <button onClick={toggleMute} className="bg-black/50 rounded-full p-2">
-            {isMuted ? <VolumeX className="w-5 h-5 text-white" /> : <Volume2 className="w-5 h-5 text-white" />}
-          </button>
         </div>
 
         {/* Bottom Content */}
@@ -177,6 +168,11 @@ const ReelItem = ({ reel, isActive }: { reel: Reel; isActive: boolean }) => {
                     className={`w-6 h-6 sm:w-7 sm:h-7 ${isBookmarked ? "text-yellow-500 fill-yellow-500" : "text-white"}`}
                   />
                 </div>
+              </button>
+
+              {/* Mute */}
+              <button onClick={toggleMute} className="bg-black/50 rounded-full p-2">
+                {isMuted ? <VolumeX className="w-6 h-6 sm:w-7 sm:h-7 text-white" /> : <Volume2 className="w-6 h-6 sm:w-7 sm:h-7 text-white" />}
               </button>
 
               {/* More */}

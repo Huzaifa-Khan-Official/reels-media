@@ -1,16 +1,17 @@
 "use client"
 
 import { useState } from "react"
-import { Home, Video, Bell, MessageCircle, Plus, User, Menu, X } from "lucide-react"
+import { Home, Video, Bell, MessageCircle, Plus, User, Menu, X, Clapperboard } from "lucide-react"
 import HomeTab from "@/components/HomeTab"
 import VideosTab from "@/components/VideoTab"
 import NotificationsTab from "@/components/NotificationsTab"
 import MessagesTab from "@/components/MessagesTab"
 import CreateTab from "@/components/CreateTab"
 import ProfileTab from "@/components/ProfileTab"
+import ReelsTab from "@/components/ReelsTab"
 
 // Tab Components
-type TabType = "home" | "videos" | "notifications" | "messages" | "create" | "profile"
+type TabType = "home" | "reels" | "videos" | "notifications" | "messages" | "create" | "profile"
 
 export default function ProfilePage() {
     const [activeTab, setActiveTab] = useState<TabType>("home");
@@ -19,6 +20,7 @@ export default function ProfilePage() {
 
     const tabs = [
         { id: "home" as TabType, label: "Home", icon: Home },
+        { id: "reels" as TabType, label: "Reels", icon: Clapperboard },
         { id: "videos" as TabType, label: "Videos", icon: Video },
         { id: "notifications" as TabType, label: "Notifications", icon: Bell },
         { id: "messages" as TabType, label: "Messages", icon: MessageCircle },
@@ -30,14 +32,14 @@ export default function ProfilePage() {
         switch (activeTab) {
             case "home":
                 return <HomeTab />
+            case "reels":
+                return <ReelsTab />
             case "videos":
                 return <VideosTab />
             case "notifications":
                 return <NotificationsTab />
             case "messages":
                 return <MessagesTab />
-            // case "create":
-            //     return <CreateTab />
             case "profile":
                 return <ProfileTab />
             default:
